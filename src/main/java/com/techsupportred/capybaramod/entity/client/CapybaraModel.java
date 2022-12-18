@@ -7,17 +7,17 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class CapybaraModel extends AnimatedGeoModel<CapybaraEntity> {
     @Override
-    public ResourceLocation getModelLocation(CapybaraEntity object) {
+    public ResourceLocation getModelResource(CapybaraEntity object) {
         return new ResourceLocation(capybaramod.MOD_ID, "geo/capybara.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureLocation(CapybaraEntity object) {
+    public ResourceLocation getTextureResource(CapybaraEntity object) {
         return new ResourceLocation(capybaramod.MOD_ID, "textures/entity/capybara/capybara.png");
     }
 
     @Override
-    public ResourceLocation getAnimationFileLocation(CapybaraEntity animatable) {
+    public ResourceLocation getAnimationResource(CapybaraEntity animatable) {
         return new ResourceLocation(capybaramod.MOD_ID, "animations/capybara.animation.json");
     }
 }
