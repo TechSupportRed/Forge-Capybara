@@ -17,7 +17,7 @@ public class ModEntityTypes {
     public static final RegistryObject<EntityType<CapybaraEntity>> CAPYBARA =
             ENTITY_TYPES.register("capybara",
                     () -> EntityType.Builder.of(CapybaraEntity::new, MobCategory.CREATURE)
-                            .sized(0.8f, 1f)
+                            .sized(0.4f, 1.5f)
                             .build(new ResourceLocation(capybaramod.MOD_ID, "capybara").toString()));
 
 
