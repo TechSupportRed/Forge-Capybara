@@ -11,9 +11,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -34,6 +32,9 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.TamableAnimal;
 
 public class CapybaraEntity extends TamableAnimal implements IAnimatable {
     private AnimationFactory factory = new AnimationFactory(this);
@@ -41,23 +42,21 @@ public class CapybaraEntity extends TamableAnimal implements IAnimatable {
     private static final EntityDataAccessor<Boolean> SITTING =
             SynchedEntityData.defineId(CapybaraEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public CapybaraEntity(EntityType<? extends TamableAnimal> entityType, Level level1) {
-        super(entityType, level1);
+    public CapybaraEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
+        super(entityType, level);
     }
 
     public static AttributeSupplier setAttributes() {
         return TamableAnimal.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 10.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.3f).build();
+                .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
     }
-
-    @Override
 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(2, new PanicGoal(this,1.250));
-        this.goalSelector.addGoal(2, new BreedGoal(this, 1.250));
+        this.goalSelector.addGoal(2, new PanicGoal(this, 1.25D));
+        this.goalSelector.addGoal(2, new BreedGoal(this, 1.25D));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, false));
 
@@ -68,7 +67,7 @@ public class CapybaraEntity extends TamableAnimal implements IAnimatable {
 
     @Nullable
     @Override
-    public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
+    public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob mob) {
         return ModEntityTypes.CAPYBARA.get().create(serverLevel);
     }
 
@@ -77,46 +76,53 @@ public class CapybaraEntity extends TamableAnimal implements IAnimatable {
         return pStack.getItem() == Items.APPLE;
     }
 
-        private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-            if (event.isMoving()) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.capybara.walk", true));
-                return PlayState.CONTINUE;
-            }
-
-            if (this.isSitting()) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.capybara.sitting"));
-                return PlayState.CONTINUE;
-            }
-
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.capybara.idle", true));
+    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        if (event.isMoving()) {
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.capybara.walk", true));
             return PlayState.CONTINUE;
         }
 
-        @Override
-        public void registerControllers(AnimationData data) {
-            data.addAnimationController(new AnimationController(this, "controller",
-                    0, this::predicate));
+        if (this.isSitting()) {
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.capybara.sitting", true));
+            return PlayState.CONTINUE;
         }
 
-        @Override
-        public AnimationFactory getFactory() {
-            return this.factory;
-        }
-        protected void playStepSound(BlockPos pos, BlockState blockIn) {
-            this.playSound(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, 0.15F, 1.0F);
-        }
+        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.capybara.idle", true));
+        return PlayState.CONTINUE;
+    }
 
-        protected SoundEvent getAmbientSound() {
-            return SoundEvents.FOX_AMBIENT;
-        }
+    @Override
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController(this, "controller",
+                0, this::predicate));
+    }
 
-        protected SoundEvent getDeathSound() {
-            return SoundEvents.DOLPHIN_DEATH;
-        }
+    @Override
+    public AnimationFactory getFactory() {
+        return this.factory;
+    }
 
-        protected float getSoundVolume() { return 0.2F; }
+    protected void playStepSound(BlockPos pos, BlockState blockIn) {
+        this.playSound(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, 0.15F, 1.0F);
+    }
 
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.FOX_AMBIENT;
+    }
 
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+        return SoundEvents.DOLPHIN_HURT;
+    }
+
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.DOLPHIN_DEATH;
+    }
+
+    protected float getSoundVolume() {
+        return 0.2F;
+    }
+
+    /* TAMEABLE */
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
@@ -150,7 +156,6 @@ public class CapybaraEntity extends TamableAnimal implements IAnimatable {
             }
         }
 
-
         if(isTame() && !this.level.isClientSide && hand == InteractionHand.MAIN_HAND) {
             setSitting(!isSitting());
             return InteractionResult.SUCCESS;
@@ -164,45 +169,50 @@ public class CapybaraEntity extends TamableAnimal implements IAnimatable {
     }
 
     @Override
-        public void readAdditionalSaveData(CompoundTag tag) {
-            super.readAdditionalSaveData(tag);
-            setSitting(tag.getBoolean("isSitting"));
-        }
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        setSitting(tag.getBoolean("isSitting"));
+    }
 
-        @Override
-        public void addAdditionalSaveData(CompoundTag tag) {
-            super.addAdditionalSaveData(tag);
-            tag.putBoolean("isSitting", this.isSitting());
-        }
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putBoolean("isSitting", this.isSitting());
+    }
 
-        @Override
-        protected void defineSynchedData() {
-            super.defineSynchedData();
-            this.entityData.define(SITTING, false);
-        }
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(SITTING, false);
+    }
 
-        public void setSitting(boolean sitting) {
-            this.entityData.set(SITTING, sitting);
-            this.setOrderedToSit(sitting);
-        }
+    public void setSitting(boolean sitting) {
+        this.entityData.set(SITTING, sitting);
+        this.setOrderedToSit(sitting);
+    }
 
-        public boolean isSitting() {
-            return this.entityData.get(SITTING);
-        }
+    public boolean isSitting() {
+        return this.entityData.get(SITTING);
+    }
 
-        @Override
-        public Team getTeam() {
-            return super.getTeam();
-        }
+    @Override
+    public Team getTeam() {
+        return super.getTeam();
+    }
 
-        public boolean canBeLeashed(Player player) {
-            return true;
-        }
+    public boolean canBeLeashed(Player player) {
+        return false;
+    }
 
     @Override
     public void setTame(boolean tamed) {
         super.setTame(tamed);
-        getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
-        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.3f);
+        if (tamed) {
+            getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
+            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.2f);
+        } else {
+            getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
+            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.2f);
+        }
     }
 }

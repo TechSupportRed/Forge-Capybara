@@ -14,11 +14,10 @@ public class ModItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, capybaramod.MOD_ID);
 
     public static final RegistryObject<Item> CAPYBARA_SPAWN_EGG = ITEMS.register("capybara_spawn_egg",
-            () -> new ForgeSpawnEggItem(ModEntityTypes.CAPYBARA,0xC4A484, 0x5C4033,
-                    new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+            () -> new ForgeSpawnEggItem(ModEntityTypes.CAPYBARA, 0xC4A484, 0x5C4033,
+                    new Item.Properties().tab(ModCreativeModeTab.CAPYBARA_TAB)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
 }
-
