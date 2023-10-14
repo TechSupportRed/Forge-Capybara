@@ -1,6 +1,5 @@
 package com.techsupportred.capybaramod;
 
-import com.mojang.logging.LogUtils;
 import com.techsupportred.capybaramod.entity.ModEntities;
 import com.techsupportred.capybaramod.entity.client.CapybaraRenderer;
 import com.techsupportred.capybaramod.item.ModCreativeModTabs;
@@ -14,7 +13,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CapybaraMod.MODID)

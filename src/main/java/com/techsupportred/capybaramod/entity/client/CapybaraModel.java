@@ -18,7 +18,7 @@ public class CapybaraModel extends GeoModel<CapybaraEntity> {
 
     @Override
     public ResourceLocation getTextureResource(CapybaraEntity animatable) {
-        return new ResourceLocation(CapybaraMod.MODID, "textures/entity/capybara_texture.png");
+        return new ResourceLocation(CapybaraMod.MODID, "textures/entity/texture.png");
     }
 
     @Override
