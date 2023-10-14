@@ -36,6 +36,8 @@ import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TamableAnimal;
 
+import java.util.Objects;
+
 public class CapybaraEntity extends TamableAnimal implements IAnimatable {
     private AnimationFactory factory = new AnimationFactory(this);
 
@@ -208,11 +210,11 @@ public class CapybaraEntity extends TamableAnimal implements IAnimatable {
     public void setTame(boolean tamed) {
         super.setTame(tamed);
         if (tamed) {
-            getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
-            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.2f);
+            Objects.requireNonNull(getAttribute(Attributes.MAX_HEALTH)).setBaseValue(10.0D);
+            Objects.requireNonNull(getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue((double)0.2f);
         } else {
-            getAttribute(Attributes.MAX_HEALTH).setBaseValue(10.0D);
-            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.2f);
+            Objects.requireNonNull(getAttribute(Attributes.MAX_HEALTH)).setBaseValue(10.0D);
+            Objects.requireNonNull(getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue((double)0.2f);
         }
     }
 }

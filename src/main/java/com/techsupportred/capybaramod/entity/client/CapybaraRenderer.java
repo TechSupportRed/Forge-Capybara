@@ -19,7 +19,7 @@ public class CapybaraRenderer extends GeoEntityRenderer<CapybaraEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(CapybaraEntity instance) {
-        return new ResourceLocation(capybaramod.MOD_ID, "textures/entity/capybara_texture.png");
+        return new ResourceLocation(capybaramod.MOD_ID, "textures/entity/texture.png");
     }
 
     @Override
